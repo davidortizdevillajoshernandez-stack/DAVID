@@ -1,6 +1,5 @@
 
-    
-            # 1. Defino st
+# 1. Defino st
 import streamlit as st
 
 # 1. Configuración de la página
