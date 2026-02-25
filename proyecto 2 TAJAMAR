@@ -1,0 +1,93 @@
+# Configuración visual de la página
+st.title("✨EXAMEN✨")
+st.write("Responde a las preguntas y pulsa el botón al final para saber tu nota.")
+
+# 2. EL FORMULARIO (Agrupamos todo para que no se recargue la web a cada clic)
+# Eso se consigue con el comando with
+
+with st.form("quiz_form"):
+
+    # Aquí guardaremos las respuestas que elija el alumno. Será una lista.
+    respuestas_usuario = []
+   
+    # Recorremos el archivador usando un bucle 'for' para crear las preguntas
+    for pregunta in preguntas:
+        st.subheader(pregunta["texto"]) # Ponemos el texto de la pregunta
+
+        # Creamos los botones de opción (radio)
+        eleccion = st.radio("Elige una opción:", pregunta["opciones"], key=pregunta["texto"])
+
+        # Guardamos la elección en nuestra lista usando append ()
+        respuestas_usuario.append(eleccion)
+        st.write("---") # Una línea para separar preguntas
+
+    # Botón obligatorio para cerrar el formulario
+    boton_enviar = st.form_submit_button("Entregar Examen")
+
+# 3. LA CORRECCIÓN (Solo ocurre cuando pulsamos el botón)
+if boton_enviar:
+    aciertos = 0
+    errores = 0
+    total = len(preguntas)
+
+    informe = ""  # Aquí guardaremos el informe en Markdown
+
+    for i in range(total):
+        pregunta_texto = preguntas[i]["texto"]
+        correcta = preguntas[i]["correcta"]
+        usuario = respuestas_usuario[i]
+
+        if usuario == correcta:
+            aciertos += 1
+            informe += f"✅ **{pregunta_texto}**\n"
+            informe += f"- Tu respuesta: {usuario}\n"
+            informe += f"- Correcta: {correcta}\n\n"
+        else:
+            errores += 1
+            informe += f"❌ **{pregunta_texto}**\n"
+            informe += f"- Tu respuesta: {usuario}\n"
+            informe += f"- Correcta: {correcta}\n\n"
+
+    # Penalización: cada error resta 0.25 puntos
+    nota = ((aciertos - errores * 0.25) / total) * 10
+
+    # Evitar notas negativas
+    if nota < 0:
+        nota = 0
+
+    nota = round(nota, 2)
+
+    # Creamos los TABS
+    tab1, tab2 = st.tabs(["📊 Nota Final", "📝 Informe Detallado"])
+
+    with tab1:
+        st.header(f"Resultado final: {nota} / 10")
+        st.write(f"Aciertos: {aciertos}")
+        st.write(f"Errores: {errores}")
+
+    with tab2:
+        st.markdown("## 📝 Informe de respuestas")
+        st.markdown(informe)
+
+    # Mostramos el resultado con colores
+    st.divider()
+   
+   
+   
+    if nota <=2:
+        st.error(f"Has tenido {aciertos} aciertos,Super INSUFICIENTE ¡Mal hecho, te quedas sin aparatos electronicos por 1 semana!")
+    elif nota <=3:
+        st.error(f"Has tenido un {aciertos} aciertos, Insuficiente ¡Mal hecho, te quedas sin aparatos electronicos por 1 dia! ")
+        st.snow()
+    elif nota <=5:
+        st.error(f"Has tenido {aciertos} aciertos, Suficiente")
+    elif nota <=6:
+        st.success(f"Has tenido {aciertos} aciertos, Bien.")
+    elif nota <=7:
+        st.success(f"Has tenido {aciertos} aciertos, Notable.")
+    elif nota <=9:
+        st.success(f"Has tenido {aciertos} aciertos, Sobresaliente.")
+        st.balloons() # ¡Efecto de globos!
+    elif nota <=10:
+        st.success(f"Has tenido {aciertos} aciertos, 🎉Excelente🎉.")
+        st.balloons() # ¡Efecto de globos!
